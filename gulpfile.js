@@ -12,10 +12,10 @@ var modules = {
         del        : 'del',
         sass       : 'gulp-ruby-sass',
         rename     : 'gulp-rename',
+        annotate   : 'gulp-ng-annotate',
         minify_css : 'gulp-minify-css',
         version    : 'gulp-rev',
         uglify     : 'gulp-uglify',
-        inject     : 'gulp-inject',
         autoprefix : 'gulp-autoprefixer',
         jshint     : 'gulp-jshint',
         size       : 'gulp-size',
@@ -45,6 +45,7 @@ PATH.src = {
     sass: 'src/content/sass',
     content: 'src/content',
     views: 'src/app/views',
+    appRoot: 'src/app',
     root: 'src'
 };
 
@@ -91,7 +92,11 @@ gulp.task('vendor', function(){
  * Concatenates all application scripts in assets/js folder
  */
 gulp.task('script', function(){
-    return gulp.src(PATH.src.js + '/**/*.js')
+    return gulp.src([
+        'src/app/app.js',
+        'src/app/**/*.js'
+    ])
+    .pipe($.annotate({'single_quotes': true}))
     .pipe($.jshint())
     .pipe($.concat('all.js'))
     .pipe(gulp.dest(PATH['public'].root));
@@ -110,13 +115,24 @@ gulp.task('style', function() {
     .pipe($.sass({
         'style': 'expanded',
         'sourcemap=none': true,
-        'container':'jandreola-gulp-ruby-sass'
+        'container':'gulp-ruby-sass'
     }))
     .pipe($.autoprefix('last 2 versions', '> 1%', 'ie 8'))
     .pipe($.size({title: 'CSS: '}))
     .pipe(gulp.dest(PATH['public'].root));
 });
 
+///////////
+// VIEWS //
+///////////
+/**
+ * Move views files from src to public
+ */
+gulp.task('views', function(){
+    return gulp.src('src/app/views/**/*.html')
+        .pipe(gulp.dest('public/views'));
+
+});
 
 ///////////
 // INDEX //
@@ -127,26 +143,17 @@ gulp.task('style', function() {
 */
 gulp.task('index', ['vendor', 'script', 'style'], function () {
 
-    // Move index first
-    gulp.src(PATH.src.views + '/index.html')
-    .pipe(gulp.dest(PATH['public'].root));
-
-    var target = gulp.src(PATH['public'].root + '/index.html');
-
-    // It's not necessary to read the files (will speed up things), we're only after their paths:
-    var sources = gulp.src([
-        PATH['public'].root + '/vendor.js',
-        PATH['public'].root + '/all.js',
-        PATH['public'].root + '/main.css'
-    ], {read: false});
-
-    return target.pipe($.inject(sources, {relative: true}))
+    // Move index to puvlic location
+    return gulp.src(PATH.src.appRoot + '/index.html')
     .pipe(gulp.dest(PATH['public'].root));
 });
 
 //////////////
 // Cleaners //
 //////////////
+/*
+ * not in use at the moment, useful with Inject
+ */
 gulp.task('clean:index', function(cb){
     return $.del([PATH['public'].root + '/index.html'], cb);
 });
@@ -158,7 +165,7 @@ gulp.task('serve', function (cb) {
       $.browserSync({
         files: ['public/**/*.{js,css,html}'],
         port: 8001,
-        notify: false,
+        notify: true,
         server: {
           baseDir: './public',
           index: 'index.html'
@@ -174,28 +181,13 @@ gulp.task('serve', function (cb) {
 /**
  * Sets watchers and triggers appropriate tasks
  */
-gulp.task('default', ['index'], function() {
-
-    // Watch for index.html changes
-    var indexWatcher = gulp.watch(PATH.src.root + '/index.html', [$.browserSync.reload]);
-
-    indexWatcher.on('change', function(){
-        var target = gulp.src(PATH.src.root + '/index.html');
-
-        // It's not necessary to read the files (will speed up things), we're only after their paths:
-        var sources = gulp.src([
-            PATH['public'].root + '/vendor.js',
-            PATH['public'].root + '/all.js',
-            PATH['public'].root + '/main.css'
-        ], {read: false});
-
-        // Inject dependencies
-        return target.pipe($.inject(sources, {relative: true}))
-            .pipe(gulp.dest(PATH['public'].root));
-    });
+gulp.task('default', ['index', 'serve'], function() {
 
     // Watch for scripts changes
-    gulp.watch(PATH.src.js + '/**/*.js', ['script']);
+    gulp.watch('src/app/views/**/*.html', ['views']);
+
+    // Watch for scripts changes
+    gulp.watch('src/app/**/*.js', ['script']);
 
     // Watch for SASS changes
     gulp.watch([PATH.src.sass + '**/*.sass'], ['style']);

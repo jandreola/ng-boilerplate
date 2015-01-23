@@ -1,0 +1,45 @@
+<!DOCTYPE html> 
+<html ng-app="app" ng-controller="BaseController as Base">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="author" content="" />
+        <meta name="copyright" content="" />
+        <meta name="robots" content="index, follow" />
+        <meta name="description" content="" />
+        <meta name="keywords" content="" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title></title>
+
+        <link rel="Shortcut Icon" href="favicon.ico" type="image/x-icon" />
+
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/main.css">
+
+        <!--[if lt IE 9 ]>
+            <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]--> 
+        
+    </head>
+
+    <body class="" lang="en-US">
+
+        <header id="primary-header">
+            <nav id="primary-navigation">
+                <ul>
+                    <li ng-repeat="nav in Base.navigation"><a ng-href="{{ nav.link }}" title="{{nav.name}}">{{ nav.name }}</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main id="content-wrapper" ng-view autoscroll>
+
+        </main>
+
+        <footer>
+        </footer>
+
+        <script src="/vendor.js"></script>
+        <script src="/all.js"></script>
+    </body>
+</html>
