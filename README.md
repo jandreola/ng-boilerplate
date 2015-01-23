@@ -1,5 +1,5 @@
 # Ng Boilerplate
-Simple boilerplate to easily initialize an not modular angular app. This is great for any small to medium project.
+Simple boilerplate to easily initialize a non modular angular app. This is great for any small to medium project.
 
 ## What does it include?
 - SASS
