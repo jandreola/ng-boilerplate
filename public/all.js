@@ -1,4 +1,4 @@
-angular.module('app', ['ngAnimate', 'ngCookies', 'ngResource', 'ngRoute']);
+angular.module('app', ['ngAnimate', 'ngCookies', 'ngResource', 'ngRoute', 'ui.bootstrap']);
 /*
  * Constants can be used in Controllers, Services, Directives, etc
  * it doesn't polute global scope 
