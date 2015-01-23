@@ -37,7 +37,7 @@ $ npm install
 
 Install bower dependencies
 ```sh
-$ npm install
+$ bower install
 ```
 
 Compile and watch for changes
